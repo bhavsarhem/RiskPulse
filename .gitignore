@@ -1,0 +1,52 @@
+# Python virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite
+*.sqlite3
+
+# MLflow tracking data
+mlruns/
+.mlflow/
+
+# Model binaries & checkpoints
+*.pkl
+*.joblib
+*.h5
+*.onnx
+*.pb
+
+# Node modules & frontend builds
+node_modules/
+dist/
+build/
+.env.local
+.env.*.local
+
+# Logs and temporary files
+*.log
+scratch/
+tmp/
+temp/
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store

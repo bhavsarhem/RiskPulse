@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: riskpulse_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: riskpulse
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: riskpulse_redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: riskpulse_backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/riskpulse
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=supersecretproductionkeychangeinprod123456
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: riskpulse_celery
+    command: celery -A backend.app.tasks.worker.celery_app worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/riskpulse
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: riskpulse_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  postgres_data:
